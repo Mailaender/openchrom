@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.chemclipse.chromatogram.msd.identifier.massSpectrumIdentifier">
+      <MassSpectrumIdentificationSupplier
+            description="Adds possible molecular formulas from estimated molecular ions."
+            id="net.openchrom.msd.identifier.supplier.cdk.formula.spectrum"
+            identifier="net.openchrom.msd.identifier.supplier.cdk.core.MassSpectrumIdentifierFormula"
+            identifierName="Formula Generator"
+            identifierSettings="net.openchrom.msd.identifier.supplier.cdk.settings.MassSpectrumFormulaSettings">
+      </MassSpectrumIdentificationSupplier>        
+   </extension>
+</plugin>

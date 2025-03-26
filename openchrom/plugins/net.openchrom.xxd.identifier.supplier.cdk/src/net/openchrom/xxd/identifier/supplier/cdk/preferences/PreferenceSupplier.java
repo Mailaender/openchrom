@@ -11,30 +11,20 @@
  *******************************************************************************/
 package net.openchrom.xxd.identifier.supplier.cdk.preferences;
 
-import java.util.Set;
-
 import org.eclipse.chemclipse.support.preferences.AbstractPreferenceSupplier;
 import org.eclipse.chemclipse.support.preferences.IPreferenceSupplier;
-import org.openscience.cdk.interfaces.IIsotope;
 
 import net.openchrom.xxd.identifier.supplier.cdk.Activator;
-import net.openchrom.xxd.identifier.supplier.cdk.formula.IsotopeDecider;
-import net.openchrom.xxd.identifier.supplier.cdk.formula.IsotopeDeciderFactory;
-import net.openchrom.xxd.identifier.supplier.cdk.formula.IsotopeParser;
 import net.openchrom.xxd.identifier.supplier.cdk.settings.CleanerSettings;
 import net.openchrom.xxd.identifier.supplier.cdk.settings.IdentifierSettings;
 
 public class PreferenceSupplier extends AbstractPreferenceSupplier implements IPreferenceSupplier {
 
+	public static final float MIN_FACTOR = 0.0f;
+	public static final float MAX_FACTOR = 100.0f;
+
 	public static final int MIN_LENGTH_NAME_EXPORT = 1;
 	public static final int MAX_LENGTH_NAME_EXPORT = 1000;
-	//
-	public static final String P_ISOTOPE_SET = "isotopeSet";
-	public static final String DEF_ISOTOPE_SET = IsotopePreference.BASIC.toString();
-	public static final String P_ISOTOPE_ITERATION_DEPTH = "isotopesIterationDepth";
-	public static final int DEF_ISOTOPE_ITERATION_DEPTH = 15;
-	public static final String P_USER_DEFINED_ISOTOPES = "userDefinedIsotopes";
-	public static final String DEF_USER_DEFINED_ISOTOPES = "C H N O";
 	/*
 	 * CDK
 	 */
@@ -78,10 +68,6 @@ public class PreferenceSupplier extends AbstractPreferenceSupplier implements IP
 	@Override
 	public void initializeDefaults() {
 
-		putDefault(P_ISOTOPE_ITERATION_DEPTH, Integer.toString(DEF_ISOTOPE_ITERATION_DEPTH));
-		putDefault(P_ISOTOPE_SET, DEF_ISOTOPE_SET);
-		putDefault(P_USER_DEFINED_ISOTOPES, DEF_USER_DEFINED_ISOTOPES);
-		//
 		putDefault(P_SMILES_STRICT, Boolean.toString(DEF_SMILES_STRICT));
 		//
 		putDefault(P_ALLOW_RADICALS, Boolean.toString(DEF_ALLOW_RADICALS));
@@ -94,40 +80,6 @@ public class PreferenceSupplier extends AbstractPreferenceSupplier implements IP
 		putDefault(P_DELETE_PEAK_TARGETS, Boolean.toString(DEF_DELETE_PEAK_TARGETS));
 		//
 		putDefault(P_SHOW_ATOMS_H, Boolean.toString(DEF_SHOW_ATOMS_H));
-	}
-
-	public static IsotopeDecider getIsotopeDecider() {
-
-		IsotopePreference isotopePreference = IsotopePreference.valueOf(INSTANCE().get(P_ISOTOPE_SET, DEF_ISOTOPE_SET));
-		IsotopeDecider isotopeDecider;
-		/*
-		 * Get the isotope decider.
-		 */
-		switch(isotopePreference) {
-			case ORGANIC:
-				isotopeDecider = IsotopeDeciderFactory.getInstance().getImportantOrganicIsotopes();
-				break;
-			case USER_DEFINED:
-				IsotopeParser isotopeParser = new IsotopeParser();
-				Set<IIsotope> isotopes = isotopeParser.extract(INSTANCE().get(P_USER_DEFINED_ISOTOPES, DEF_USER_DEFINED_ISOTOPES));
-				isotopeDecider = IsotopeDeciderFactory.getInstance().getIsotopeDeciderFromIsotopeSet(isotopes);
-				break;
-			default: // BASIC
-				isotopeDecider = IsotopeDeciderFactory.getInstance().getBasicIsotopes();
-				break;
-		}
-		/*
-		 * Set the iteration depth.
-		 */
-		int iterationDepth = INSTANCE().getInteger(P_ISOTOPE_ITERATION_DEPTH, DEF_ISOTOPE_ITERATION_DEPTH);
-		isotopeDecider.setIterationDepth(iterationDepth);
-		//
-		return isotopeDecider;
-	}
-
-	public static String[][] getIsotopePreferenceOptions() {
-
-		return new String[][]{{"&Basic Isotope Set (C,H,N,O)", IsotopePreference.BASIC.toString()}, {"&Organic Isotope Set (C,H,N,O,Cl,Br,S,P,I,B)", IsotopePreference.ORGANIC.toString()}, {"&User Defined Isotope Set", IsotopePreference.USER_DEFINED.toString()}};
 	}
 
 	public static IdentifierSettings getIdentifierSettings() {
