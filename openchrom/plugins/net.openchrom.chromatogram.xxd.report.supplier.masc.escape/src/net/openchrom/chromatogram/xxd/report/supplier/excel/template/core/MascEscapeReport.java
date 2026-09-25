@@ -14,13 +14,13 @@ package net.openchrom.chromatogram.xxd.report.supplier.excel.template.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.chemclipse.chromatogram.xxd.report.chromatogram.AbstractChromatogramReportGenerator;
 import org.eclipse.chemclipse.chromatogram.xxd.report.settings.IChromatogramReportSettings;
 import org.eclipse.chemclipse.logging.core.Logger;
 import org.eclipse.chemclipse.model.core.IChromatogram;
+import org.eclipse.chemclipse.msd.model.core.IChromatogramMSD;
 import org.eclipse.chemclipse.processing.core.IProcessingInfo;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -32,15 +32,21 @@ public class MascEscapeReport extends AbstractChromatogramReportGenerator {
 
 	private static final Logger logger = Logger.getLogger(MascEscapeReport.class);
 
-	public IProcessingInfo<File> report(File file, boolean append, List<IChromatogram> chromatograms, IChromatogramReportSettings settings) {
+	public IProcessingInfo<File> report(File file, IChromatogram chromatogram, IChromatogramReportSettings settings) {
 
 		IProcessingInfo<File> processingInfo = super.validate(file);
 		if(!processingInfo.hasErrorMessages()) {
+
 			if(settings instanceof ChromatogramReportSettings reportSettings) {
 				try {
 					MascEscapeReportWriter chromatogramReport = new MascEscapeReportWriter();
-					chromatogramReport.generate(file, append, chromatograms, reportSettings);
-					processingInfo.setProcessingResult(file);
+					if(chromatogram instanceof IChromatogramMSD chromatogramMSD) {
+						chromatogramReport.generate(file, chromatogramMSD, reportSettings);
+						processingInfo.setProcessingResult(file);
+					} else {
+						processingInfo.addErrorMessage("ESCAPE Report", "This report expects MSD chromatograms");
+						return processingInfo;
+					}
 				} catch(IOException e) {
 					logger.error(e);
 					processingInfo.addErrorMessage("MaSC Report", "The report couldn't be created.");
@@ -55,35 +61,26 @@ public class MascEscapeReport extends AbstractChromatogramReportGenerator {
 	@Override
 	public IProcessingInfo<File> generate(File file, boolean append, IChromatogram chromatogram, IProgressMonitor monitor) {
 
-		List<IChromatogram> chromatograms = getChromatogramList(chromatogram);
-		ChromatogramReportSettings settings = PreferenceSupplier.getReportSettings();
-		return report(file, append, chromatograms, settings);
+		IChromatogramReportSettings settings = PreferenceSupplier.getReportSettings();
+		return report(file, chromatogram, settings);
 	}
 
 	@Override
 	public IProcessingInfo<File> generate(File file, boolean append, List<IChromatogram> chromatograms, IProgressMonitor monitor) {
 
-		ChromatogramReportSettings settings = PreferenceSupplier.getReportSettings();
-		return report(file, append, chromatograms, settings);
+		IChromatogramReportSettings settings = PreferenceSupplier.getReportSettings();
+		return report(file, chromatograms.getFirst(), settings);
 	}
 
 	@Override
 	public IProcessingInfo<?> generate(File file, boolean append, IChromatogram chromatogram, IChromatogramReportSettings settings, IProgressMonitor monitor) {
 
-		List<IChromatogram> chromatograms = getChromatogramList(chromatogram);
-		return report(file, append, chromatograms, settings);
+		return report(file, chromatogram, settings);
 	}
 
 	@Override
 	public IProcessingInfo<?> generate(File file, boolean append, List<IChromatogram> chromatograms, IChromatogramReportSettings settings, IProgressMonitor monitor) {
 
-		return report(file, append, chromatograms, settings);
-	}
-
-	protected List<IChromatogram> getChromatogramList(IChromatogram chromatogram) {
-
-		List<IChromatogram> chromatograms = new ArrayList<>();
-		chromatograms.add(chromatogram);
-		return chromatograms;
+		return report(file, chromatograms.getFirst(), settings);
 	}
 }

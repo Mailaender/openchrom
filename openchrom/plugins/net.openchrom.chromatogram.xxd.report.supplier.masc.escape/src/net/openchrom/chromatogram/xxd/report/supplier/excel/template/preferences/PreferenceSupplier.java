@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024, 2026 Lablicate GmbH.
+ * Copyright (c) 2026 Lablicate GmbH.
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,12 +9,12 @@
  * 
  * Contributors:
  * Matthias Mailänder - initial API and implementation
- * Philip Wenig - modular placeholder support
  *******************************************************************************/
 package net.openchrom.chromatogram.xxd.report.supplier.excel.template.preferences;
 
 import java.io.File;
 
+import org.eclipse.chemclipse.chromatogram.xxd.report.settings.IChromatogramReportSettings;
 import org.eclipse.chemclipse.support.preferences.AbstractPreferenceSupplier;
 import org.eclipse.chemclipse.support.preferences.IPreferenceSupplier;
 import org.osgi.framework.FrameworkUtil;
@@ -23,10 +23,11 @@ import net.openchrom.chromatogram.xxd.report.supplier.excel.template.settings.Ch
 
 public class PreferenceSupplier extends AbstractPreferenceSupplier {
 
-	public static final String P_TEMPLATE = "excelReportTemplateFile";
+	public static final String P_TEMPLATE = "EscapeExcelTemplateFile";
 	public static final String DEF_TEMPLATE = ".xltx";
-	public static final String P_LIST_PATH_EXPORT = "listPathExport";
-	public static final String DEF_LIST_PATH_EXPORT = "";
+
+	public static final String P_REPORT = "EscapeExcelReportFile";
+	public static final String DEF_REFPORT = ".xlts";
 
 	public static IPreferenceSupplier INSTANCE() {
 
@@ -43,14 +44,15 @@ public class PreferenceSupplier extends AbstractPreferenceSupplier {
 	public void initializeDefaults() {
 
 		putDefault(P_TEMPLATE, DEF_TEMPLATE);
-		putDefault(P_LIST_PATH_EXPORT, DEF_LIST_PATH_EXPORT);
+		putDefault(P_REPORT, DEF_REFPORT);
 	}
 
-	public static ChromatogramReportSettings getReportSettings() {
+	public static IChromatogramReportSettings getReportSettings() {
 
 		ChromatogramReportSettings reportSettings = new ChromatogramReportSettings();
 		reportSettings.setTemplate(getTemplate());
-		return reportSettings;
+		reportSettings.setReport(getReport());
+		return (IChromatogramReportSettings)reportSettings;
 	}
 
 	public static File getTemplate() {
@@ -63,13 +65,13 @@ public class PreferenceSupplier extends AbstractPreferenceSupplier {
 		INSTANCE().put(P_TEMPLATE, file.getAbsolutePath());
 	}
 
-	public static String getListPathExport() {
+	public static File getReport() {
 
-		return INSTANCE().get(P_LIST_PATH_EXPORT);
+		return new File(INSTANCE().get(P_REPORT, DEF_TEMPLATE));
 	}
 
-	public static void setListPathExport(String filterPath) {
+	public static void setReport(File file) {
 
-		INSTANCE().put(P_LIST_PATH_EXPORT, filterPath);
+		INSTANCE().put(P_REPORT, file.getAbsolutePath());
 	}
 }
