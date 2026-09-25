@@ -43,12 +43,6 @@ import net.openchrom.chromatogram.xxd.report.supplier.excel.template.settings.Ch
 
 public class MascEscapeReportWriter {
 
-	public static final String DESCRIPTION = "Excel Template";
-	public static final String FILE_EXTENSION = ".xltx";
-	public static final String FILE_NAME = DESCRIPTION.replaceAll("\\s", "") + FILE_EXTENSION;
-	public static final String FILTER_EXTENSION = "*" + FILE_EXTENSION;
-	public static final String FILTER_NAME = DESCRIPTION + " (*" + FILE_EXTENSION + ")";
-
 	public void generate(File file, IChromatogramMSD chromatogram, ChromatogramReportSettings reportSettings) throws IOException {
 
 		try (FileInputStream fileInputStreamTemplate = new FileInputStream(reportSettings.getTemplate())) {
